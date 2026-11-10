@@ -12,34 +12,39 @@ export default function ModuleView() {
 
   if (!mod) return <div className="p-10 text-center text-xl font-bold">Loading...</div>
 
-  // Smart URL embedder for YouTube, Google Drive, and Vimeo
+  // Smart URL embedder for popular video platforms
   const getEmbedUrl = (url) => {
     if (!url) return ''
     
-    // YouTube
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      if (match && match[2].length === 11) return `https://www.youtube.com/embed/${match[2]}`;
-    }
+    // 1. YouTube
+    const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    const ytMatch = url.match(ytRegex);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
     
-    // Google Drive (Turns share link into preview link)
-    if (url.includes('drive.google.com')) {
-      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) return `https://drive.google.com/file/d/${match[1]}/preview`;
-    }
+    // 2. Google Drive
+    const gdRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/i;
+    const gdMatch = url.match(gdRegex);
+    if (gdMatch) return `https://drive.google.com/file/d/${gdMatch[1]}/preview`;
     
-    // Vimeo
-    if (url.includes('vimeo.com')) {
-      const match = url.match(/vimeo\.com\/(\d+)/);
-      if (match) return `https://player.vimeo.com/video/${match[1]}`;
-    }
+    // 3. Vimeo
+    const vimeoRegex = /vimeo\.com\/(?:video\/)?(\d+)/i;
+    const vimeoMatch = url.match(vimeoRegex);
+    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
     
+    // 4. Facebook Video
+    if (url.includes('facebook.com') && url.includes('/videos/')) {
+       return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0`;
+    }
+
+    // Fallback for direct embed links
     return url;
   }
 
-  // Check if the link is a direct video file (mp4, webm, etc.)
-  const isDirectVideo = mod.video_url && (mod.video_url.match(/\.(mp4|webm|ogg)$/i) !== null);
+  // Check if it's a direct video file (mp4, webm, ogg)
+  const isDirectVideo = mod.video_url && (mod.video_url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) !== null);
+  
+  // Get the formatted URL for iframes
+  const embedUrl = mod.video_url ? getEmbedUrl(mod.video_url) : '';
 
   return (
     <div className="min-h-screen bg-[#faf8f6] p-6 max-w-[1100px] mx-auto text-[#2d241f]">
@@ -58,10 +63,10 @@ export default function ModuleView() {
             // Play direct video files (mp4, webm)
             <video controls className="w-full rounded-lg border border-[#eee]" src={mod.video_url} />
           ) : (
-            // Embed YouTube, Drive, Vimeo, or other links
+            // Embed YouTube, Drive, Vimeo, etc.
             <div className="aspect-video w-full rounded-lg overflow-hidden border border-[#eee]">
               <iframe 
-                src={getEmbedUrl(mod.video_url)} 
+                src={embedUrl} 
                 className="w-full h-full" 
                 allowFullScreen 
                 title="Video Lesson"
@@ -69,6 +74,14 @@ export default function ModuleView() {
               />
             </div>
           )}
+
+          {/* Fallback link in case the iframe is still blocked */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-500 mb-1">Video not loading?</p>
+            <a href={mod.video_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#315f8a] underline font-bold">
+              Open Video in New Tab
+            </a>
+          </div>
         </div>
       )}
 
@@ -76,6 +89,11 @@ export default function ModuleView() {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-[#ddd]">
           <h2 className="text-xl text-[#7a3e00] font-bold mb-4">Document</h2>
           <iframe src={mod.document_url} className="w-full h-[600px] border rounded-lg" title="Document Viewer" />
+          <div className="mt-4 text-center">
+            <a href={mod.document_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#315f8a] underline font-bold">
+              Download / View Document
+            </a>
+          </div>
         </div>
       )}
     </div>

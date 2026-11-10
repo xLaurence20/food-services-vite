@@ -22,7 +22,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#faf8f6] text-[#2d241f] font-sans">
       <header className="bg-gradient-to-br from-[#6d3500] to-[#b96b2d] text-white p-10 text-center">
-        <h1 className="text-3xl font-bold mb-2">AI-Integrated Digital Learning Module</h1>
+        <h1 className="text-3xl font-bold mb-2">Digital Learning Module</h1>
         <p className="font-bold">Food Services • Grade 9</p>
       </header>
 

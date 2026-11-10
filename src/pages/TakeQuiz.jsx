@@ -21,11 +21,23 @@ export default function TakeQuiz() {
 
   const handleSelect = (qId, optionIndex) => setAnswers({ ...answers, [qId]: optionIndex })
 
-  const handleSubmit = () => {
+    const handleSubmit = async () => {
     let score = 0
     questions.forEach(q => {
       if (answers[q.id] === q.correct_index) score++
     })
+    
+    // Save the attempt to Supabase
+    try {
+      await supabase.from('attempts').insert({
+        quiz_id: quiz.id,
+        score: score,
+        total: questions.length
+      })
+    } catch (error) {
+      console.error("Error saving score:", error)
+    }
+
     setResult({ score, total: questions.length })
   }
 

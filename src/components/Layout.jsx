@@ -6,7 +6,8 @@ export default function Layout() {
   const navItems = [
     { name: 'Home', path: '/dashboard' },
     { name: 'Upload Module', path: '/upload' },
-    { name: 'Create Quiz', path: '/create-quiz' }, // <-- ADDED THIS
+    { name: 'Create Quiz', path: '/create-quiz' }, 
+    { name: 'Statistics', path: '/stats' },
   ]
 
   return (

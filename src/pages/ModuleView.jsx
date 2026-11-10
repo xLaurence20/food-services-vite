@@ -5,40 +5,40 @@ import { supabase } from '../supabaseClient'
 export default function ModuleView() {
   const { id } = useParams()
   const [mod, setMod] = useState(null)
+  const [quiz, setQuiz] = useState(null) // <-- NEW
 
   useEffect(() => {
-    supabase.from('modules').select('*').eq('id', id).single().then(({ data }) => setMod(data))
+    async function fetchData() {
+      const { data: moduleData } = await supabase.from('modules').select('*').eq('id', id).single()
+      setMod(moduleData)
+      
+      const { data: quizData } = await supabase.from('quizzes').select('*').eq('module_id', id).single()
+      setQuiz(quizData)
+    }
+    fetchData()
   }, [id])
 
   if (!mod) return <div className="p-10 text-center text-xl font-bold text-[#7a3e00]">Loading...</div>
 
+  // ... (keep the getEmbedUrl, isDirectVideo, getDocumentViewerUrl logic exactly the same as before)
   const getEmbedUrl = (url) => {
     if (!url) return ''
     const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
     const ytMatch = url.match(ytRegex);
     if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
-    
     const gdRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/i;
     const gdMatch = url.match(gdRegex);
     if (gdMatch) return `https://drive.google.com/file/d/${gdMatch[1]}/preview`;
-    
     return url;
   }
-
   const isDirectVideo = mod.video_url && (mod.video_url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) !== null);
   const embedUrl = mod.video_url ? getEmbedUrl(mod.video_url) : '';
-
   const getDocumentViewerUrl = (url) => {
     if (!url) return '';
-    if (url.toLowerCase().includes('.pdf')) {
-       return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-    }
-    if (url.toLowerCase().match(/\.(doc|docx|ppt|pptx|xls|xlsx)$/)) {
-       return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
-    }
+    if (url.toLowerCase().includes('.pdf')) return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    if (url.toLowerCase().match(/\.(doc|docx|ppt|pptx|xls|xlsx)$/)) return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
     return url;
   }
-
   const documentViewerUrl = getDocumentViewerUrl(mod.document_url);
 
   return (
@@ -49,6 +49,15 @@ export default function ModuleView() {
         <span className="inline-block bg-[#efd0ae] text-[#67330d] rounded-full px-3 py-1 text-xs font-bold mb-3">LESSON</span>
         <h1 className="text-2xl text-[#7a3e00] font-bold">{mod.title}</h1>
         <p className="text-gray-600 mt-2">{mod.description}</p>
+
+        {/* --- NEW: QUIZ BUTTON --- */}
+        {quiz && (
+          <div className="mt-6 border-t border-[#ddd] pt-4">
+            <Link to={`/quiz/${quiz.id}`} className="inline-block bg-[#315f8a] text-white px-6 py-3 rounded-lg font-bold hover:opacity-90">
+              📝 Take Quiz: {quiz.title}
+            </Link>
+          </div>
+        )}
       </div>
 
       {mod.video_url && (
@@ -58,12 +67,9 @@ export default function ModuleView() {
             <video controls className="w-full rounded-lg border border-[#eee]" src={mod.video_url} />
           ) : (
             <div className="aspect-video w-full rounded-lg overflow-hidden border border-[#eee]">
-              <iframe src={embedUrl} className="w-full h-full" allowFullScreen title="Video Lesson" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+              <iframe src={embedUrl} className="w-full h-full" allowFullScreen title="Video Lesson" />
             </div>
           )}
-          <div className="mt-4 text-center">
-            <a href={mod.video_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#315f8a] underline font-bold">Open Video in New Tab</a>
-          </div>
         </div>
       )}
 

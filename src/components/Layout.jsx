@@ -5,20 +5,18 @@ export default function Layout() {
 
   const navItems = [
     { name: 'Home', path: '/dashboard' },
-    { name: 'Lessons', path: '/dashboard' }, // In a full app, this might scroll to lessons
-    { name: 'Upload', path: '/upload' },
+    { name: 'Upload Module', path: '/upload' },
+    { name: 'Create Quiz', path: '/create-quiz' }, // <-- ADDED THIS
   ]
 
   return (
     <div className="min-h-screen bg-[#faf8f6] text-[#2d241f] font-sans flex flex-col">
-      {/* HEADER */}
       <header className="bg-gradient-to-br from-[#6d3500] to-[#b96b2d] text-white py-10 px-4 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Digital Learning Module</h1>
         <p className="font-bold">Food Services • Grade 9</p>
         <p className="text-sm opacity-90 mt-1">Revised K–10 Curriculum | Thesis Prototype</p>
       </header>
 
-      {/* NAVBAR */}
       <nav className="sticky top-0 z-10 bg-white border-b border-[#ddd] flex flex-wrap justify-center">
         {navItems.map((item) => (
           <Link
@@ -33,12 +31,10 @@ export default function Layout() {
         ))}
       </nav>
 
-      {/* PAGE CONTENT */}
       <main className="flex-grow max-w-[1100px] w-full mx-auto p-4 md:p-6">
         <Outlet />
       </main>
 
-      {/* FOOTER */}
       <footer className="bg-[#2d241f] text-white text-center p-6 mt-10">
         <p className="font-bold text-lg">Digital Learning Module for Food Services</p>
         <p className="text-sm opacity-80 mt-1">Grade 9 • Revised K–10 Curriculum • Research Prototype</p>

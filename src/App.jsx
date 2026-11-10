@@ -3,6 +3,8 @@ import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import ModuleView from './pages/ModuleView'
+import CreateQuiz from './pages/CreateQuiz' // <-- ADD
+import TakeQuiz from './pages/TakeQuiz'     // <-- ADD
 
 function App() {
   return (
@@ -12,7 +14,9 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="upload" element={<Upload />} />
+          <Route path="create-quiz" element={<CreateQuiz />} /> {/* <-- ADD */}
           <Route path="module/:id" element={<ModuleView />} />
+          <Route path="quiz/:id" element={<TakeQuiz />} />       {/* <-- ADD */}
         </Route>
       </Routes>
     </BrowserRouter>

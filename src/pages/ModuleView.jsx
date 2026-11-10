@@ -10,9 +10,8 @@ export default function ModuleView() {
     supabase.from('modules').select('*').eq('id', id).single().then(({ data }) => setMod(data))
   }, [id])
 
-  if (!mod) return <div className="p-10 text-center text-xl font-bold">Loading...</div>
+  if (!mod) return <div className="p-10 text-center text-xl font-bold text-[#7a3e00]">Loading...</div>
 
-  // Smart URL embedder for video
   const getEmbedUrl = (url) => {
     if (!url) return ''
     const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -29,81 +28,54 @@ export default function ModuleView() {
   const isDirectVideo = mod.video_url && (mod.video_url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) !== null);
   const embedUrl = mod.video_url ? getEmbedUrl(mod.video_url) : '';
 
-  // SMART DOCUMENT VIEWER LOGIC
   const getDocumentViewerUrl = (url) => {
     if (!url) return '';
-    
-    // If it's a PDF, try to render it natively, but fallback to Google Docs viewer to prevent auto-download
     if (url.toLowerCase().includes('.pdf')) {
        return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
     }
-    
-    // If it's a Word, Excel, or PowerPoint file, use Microsoft's free Online Viewer.
-    // This automatically gives you the Next/Previous slide buttons for PPTs!
     if (url.toLowerCase().match(/\.(doc|docx|ppt|pptx|xls|xlsx)$/)) {
        return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
     }
-    
-    // Default fallback
     return url;
   }
 
   const documentViewerUrl = getDocumentViewerUrl(mod.document_url);
 
   return (
-    <div className="min-h-screen bg-[#faf8f6] p-6 max-w-[1100px] mx-auto text-[#2d241f]">
-      <Link to="/dashboard" className="text-sm text-[#7a3e00] font-bold underline mb-4 inline-block">← Back to Lessons</Link>
+    <div className="space-y-6">
+      <Link to="/dashboard" className="text-sm text-[#7a3e00] font-bold hover:underline inline-block">← Back to Lessons</Link>
       
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-[#ddd] mb-6">
+      <div className="bg-white rounded-[15px] p-6 shadow-[0_2px_10px_rgba(0,0,0,0.07)]">
+        <span className="inline-block bg-[#efd0ae] text-[#67330d] rounded-full px-3 py-1 text-xs font-bold mb-3">LESSON</span>
         <h1 className="text-2xl text-[#7a3e00] font-bold">{mod.title}</h1>
         <p className="text-gray-600 mt-2">{mod.description}</p>
       </div>
 
       {mod.video_url && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#ddd] mb-6">
+        <div className="bg-white rounded-[15px] p-6 shadow-[0_2px_10px_rgba(0,0,0,0.07)]">
           <h2 className="text-xl text-[#7a3e00] font-bold mb-4">Video Lesson</h2>
-          
           {isDirectVideo ? (
             <video controls className="w-full rounded-lg border border-[#eee]" src={mod.video_url} />
           ) : (
             <div className="aspect-video w-full rounded-lg overflow-hidden border border-[#eee]">
-              <iframe 
-                src={embedUrl} 
-                className="w-full h-full" 
-                allowFullScreen 
-                title="Video Lesson"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              />
+              <iframe src={embedUrl} className="w-full h-full" allowFullScreen title="Video Lesson" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
             </div>
           )}
+          <div className="mt-4 text-center">
+            <a href={mod.video_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#315f8a] underline font-bold">Open Video in New Tab</a>
+          </div>
         </div>
       )}
 
       {mod.document_url && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#ddd]">
+        <div className="bg-white rounded-[15px] p-6 shadow-[0_2px_10px_rgba(0,0,0,0.07)]">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl text-[#7a3e00] font-bold">Document Viewer</h2>
-            <a 
-              href={mod.document_url} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="bg-[#315f8a] text-white text-sm px-4 py-2 rounded-lg font-bold hover:opacity-90"
-            >
-              Download Original File
-            </a>
+            <a href={mod.document_url} target="_blank" rel="noopener noreferrer" className="bg-[#315f8a] text-white text-sm px-4 py-2 rounded-lg font-bold hover:opacity-90">Download File</a>
           </div>
-          
-          {/* THE SMART IFRAME */}
           <div className="w-full h-[700px] border border-[#eee] rounded-lg overflow-hidden bg-gray-50">
-            <iframe 
-              src={documentViewerUrl} 
-              className="w-full h-full" 
-              title="Document Viewer"
-            />
+            <iframe src={documentViewerUrl} className="w-full h-full" title="Document Viewer" />
           </div>
-          <p className="text-xs text-center text-gray-500 mt-2">
-            (If the document does not load, click "Download Original File" above).
-          </p>
         </div>
       )}
     </div>

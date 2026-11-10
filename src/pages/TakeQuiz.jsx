@@ -48,7 +48,7 @@ export default function TakeQuiz() {
       <div className="bg-white max-w-xl mx-auto mt-10 p-8 rounded-[15px] shadow-lg text-center">
         <span className="inline-block bg-[#efd0ae] text-[#67330d] rounded-full px-4 py-2 text-sm font-bold mb-4">RESULT</span>
         <h2 className="text-3xl font-bold text-[#7a3e00] mb-4">You scored {result.score} / {result.total}</h2>
-        <Link to="/dashboard" className="bg-[#7a3e00] text-white px-6 py-3 rounded-lg font-bold">Back to Dashboard</Link>
+        <Link to="/quiz" className="bg-[#7a3e00] text-white px-6 py-3 rounded-lg font-bold">Back to Quizzes</Link>
       </div>
     )
   }

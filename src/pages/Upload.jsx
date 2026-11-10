@@ -88,7 +88,7 @@ export default function Upload() {
         }
       }
 
-      navigate('/dashboard')
+      navigate('/quiz')
     } catch (err) {
       alert(err.message)
     } finally {

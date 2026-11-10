@@ -50,7 +50,7 @@ export default function CreateQuiz() {
       const { error: qErr } = await supabase.from('questions').insert(formattedQuestions)
       if (qErr) throw qErr
 
-      navigate('/dashboard')
+      navigate('/lessons')
     } catch (err) {
       alert(err.message)
     } finally {
